@@ -10,154 +10,154 @@
     "footer_text": ""
   },
   "commands": {
-    "start": {
+    "/start": {
       "text": "ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ғɪʟᴇ sʜᴀʀɪɴɢ ʙᴏᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "help": {
+    "/help": {
       "text": "ғɪʟᴇ sʜᴀʀɪɴɢ ᴄᴏᴍᴍᴀɴᴅ ɢᴜɪᴅᴇ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "about": {
+    "/about": {
       "text": "ᴀʙᴏᴜᴛ ᴛʜɪs ғɪʟᴇ sʜᴀʀɪɴɢ ʙᴏᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "ping": {
+    "/ping": {
       "text": "ʙᴏᴛ ʀᴇsᴘᴏɴsᴇ ᴀɴᴅ ʜᴇᴀʟᴛʜ ᴄʜᴇᴄᴋ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "settings": {
+    "/settings": {
       "text": "ғɪʟᴇ sʜᴀʀɪɴɢ ʙᴏᴛ sᴇᴛᴛɪɴɢs ɢᴜɪᴅᴇ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "genlink": {
+    "/genlink": {
       "text": "sɪɴɢʟᴇ ғɪʟᴇ sʜᴀʀᴇ ʟɪɴᴋ ɢᴇɴᴇʀᴀᴛɪᴏɴ ʀᴇsᴜʟᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "batch": {
+    "/batch": {
       "text": "ʙᴀᴛᴄʜ ғɪʟᴇ sʜᴀʀᴇ ʟɪɴᴋ ɢᴇɴᴇʀᴀᴛɪᴏɴ ʀᴇsᴜʟᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "collections": {
+    "/collections": {
       "text": "ᴄᴏʟʟᴇᴄᴛɪᴏɴ ᴅᴀsʜʙᴏᴀʀᴅ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "collection": {
+    "/collection": {
       "text": "sɪɴɢʟᴇ ᴄᴏʟʟᴇᴄᴛɪᴏɴ ᴅᴇᴛᴀɪʟs.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "delivery_stats": {
+    "/delivery_stats": {
       "text": "ғɪʟᴇ ᴅᴇʟɪᴠᴇʀʏ ᴀɴᴀʟʏᴛɪᴄs.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "dlt_time": {
+    "/dlt_time": {
       "text": "ᴀᴜᴛᴏ-ᴅᴇʟᴇᴛᴇ ᴛɪᴍᴇ ᴜᴘᴅᴀᴛᴇ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "storagehealth": {
+    "/storagehealth": {
       "text": "ᴄᴇɴᴛʀᴀʟ sᴛᴏʀᴀɢᴇ ʜᴇᴀʟᴛʜ ᴄʜᴇᴄᴋ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "regenerate": {
+    "/regenerate": {
       "text": "sʜᴀʀᴇ ʟɪɴᴋ ʀᴇɢᴇɴᴇʀᴀᴛɪᴏɴ ʀᴇsᴜʟᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "link": {
+    "/link": {
       "text": "ᴅɪʀᴇᴄᴛ sᴛʀᴇᴀᴍ ʟɪɴᴋ sᴛᴀᴛᴜs.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "texts": {
+    "/texts": {
       "text": "ᴇᴅɪᴛᴀʙʟᴇ ᴍᴇssᴀɢᴇ ᴛᴇᴍᴘʟᴀᴛᴇ ʟɪsᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "edittext": {
+    "/edittext": {
       "text": "ᴍᴇssᴀɢᴇ ᴛᴇᴍᴘʟᴀᴛᴇ ᴇᴅɪᴛᴏʀ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "previewtext": {
+    "/previewtext": {
       "text": "ᴍᴇssᴀɢᴇ ᴛᴇᴍᴘʟᴀᴛᴇ ᴘʀᴇᴠɪᴇᴡ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "resettext": {
+    "/resettext": {
       "text": "ᴍᴇssᴀɢᴇ ᴛᴇᴍᴘʟᴀᴛᴇ ʀᴇsᴇᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "buttons": {
+    "/buttons": {
       "text": "ᴛᴇᴍᴘʟᴀᴛᴇ ʙᴜᴛᴛᴏɴ ʟɪsᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "addbutton": {
+    "/addbutton": {
       "text": "ᴛᴇᴍᴘʟᴀᴛᴇ ʙᴜᴛᴛᴏɴ ᴀᴅᴅ ʀᴇsᴜʟᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "editbutton": {
+    "/editbutton": {
       "text": "ᴛᴇᴍᴘʟᴀᴛᴇ ʙᴜᴛᴛᴏɴ ᴇᴅɪᴛ ʀᴇsᴜʟᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
         "url": "https://t.me/"
       }
     },
-    "delbutton": {
+    "/delbutton": {
       "text": "ᴛᴇᴍᴘʟᴀᴛᴇ ʙᴜᴛᴛᴏɴ ʀᴇᴍᴏᴠᴀʟ ʀᴇsᴜʟᴛ.",
       "button": {
         "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
