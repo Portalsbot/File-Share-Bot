@@ -1,14 +1,14 @@
 from __future__ import annotations
 import os
 from pathlib import Path
-from telegram.ext import ApplicationBuilder
+from telegram.ext import ApplicationBuilder, CallbackQueryHandler
 from .config import Settings
 from .database import Database
 from .defaults import DEFAULT_MESSAGES
 from .settings import add_common_handlers
 from .message_editor.handlers import add_editor_handlers
 from .handlers.files import add_file_handlers
-from .errors import error_handler
+from .errors import error_handler\nfrom .branding import close_branded_message
 
 async def post_init(app):
     s=app.bot_data["settings"]
@@ -32,7 +32,7 @@ def main():
         "defaults":DEFAULT_MESSAGES,"product":"file","storage_channel_id":settings.storage_channel_id,
         "default_auto_delete":settings.default_auto_delete,"max_files_per_user":settings.max_files_per_user,
         "protect_content":True})
-    add_common_handlers(app); add_editor_handlers(app); add_file_handlers(app); app.add_error_handler(error_handler)
+    app.add_handler(CallbackQueryHandler(close_branded_message, pattern=r"^branding:close$"), group=-1)\n    add_common_handlers(app); add_editor_handlers(app); add_file_handlers(app); app.add_error_handler(error_handler)
     app.run_polling(allowed_updates=["message","callback_query","chat_member"])
 
 if __name__=="__main__": main()
