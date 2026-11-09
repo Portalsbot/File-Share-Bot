@@ -43,7 +43,7 @@ async def send_branded(
 ):
     body = str(text or "")
     if FOOTER_MESSAGE:
-        body = f"{body}\\n\\n{FOOTER_MESSAGE}" if body else FOOTER_MESSAGE
+        body = f"{body}\n\n{FOOTER_MESSAGE}" if body else FOOTER_MESSAGE
 
     requested_path = Path(image_path) if image_path else IMAGE_PATH
     local_photo = requested_path if requested_path.is_file() else None
