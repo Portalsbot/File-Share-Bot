@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "branding": {
+    "image_url": "https://raw.githubusercontent.com/Portalsbot/image/main/photo_2026-11-01_20-42-48.jpg",
+    "small_caps": true,
+    "dummy_button": {
+      "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+      "url": "https://t.me/"
+    },
+    "footer_text": ""
+  },
+  "commands": {
+    "start": {
+      "text": "ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ғɪʟᴇ sʜᴀʀɪɴɢ ʙᴏᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "help": {
+      "text": "ғɪʟᴇ sʜᴀʀɪɴɢ ᴄᴏᴍᴍᴀɴᴅ ɢᴜɪᴅᴇ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "about": {
+      "text": "ᴀʙᴏᴜᴛ ᴛʜɪs ғɪʟᴇ sʜᴀʀɪɴɢ ʙᴏᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "ping": {
+      "text": "ʙᴏᴛ ʀᴇsᴘᴏɴsᴇ ᴀɴᴅ ʜᴇᴀʟᴛʜ ᴄʜᴇᴄᴋ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "settings": {
+      "text": "ғɪʟᴇ sʜᴀʀɪɴɢ ʙᴏᴛ sᴇᴛᴛɪɴɢs ɢᴜɪᴅᴇ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "genlink": {
+      "text": "sɪɴɢʟᴇ ғɪʟᴇ sʜᴀʀᴇ ʟɪɴᴋ ɢᴇɴᴇʀᴀᴛɪᴏɴ ʀᴇsᴜʟᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "batch": {
+      "text": "ʙᴀᴛᴄʜ ғɪʟᴇ sʜᴀʀᴇ ʟɪɴᴋ ɢᴇɴᴇʀᴀᴛɪᴏɴ ʀᴇsᴜʟᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "collections": {
+      "text": "ᴄᴏʟʟᴇᴄᴛɪᴏɴ ᴅᴀsʜʙᴏᴀʀᴅ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "collection": {
+      "text": "sɪɴɢʟᴇ ᴄᴏʟʟᴇᴄᴛɪᴏɴ ᴅᴇᴛᴀɪʟs.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "delivery_stats": {
+      "text": "ғɪʟᴇ ᴅᴇʟɪᴠᴇʀʏ ᴀɴᴀʟʏᴛɪᴄs.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "dlt_time": {
+      "text": "ᴀᴜᴛᴏ-ᴅᴇʟᴇᴛᴇ ᴛɪᴍᴇ ᴜᴘᴅᴀᴛᴇ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "storagehealth": {
+      "text": "ᴄᴇɴᴛʀᴀʟ sᴛᴏʀᴀɢᴇ ʜᴇᴀʟᴛʜ ᴄʜᴇᴄᴋ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "regenerate": {
+      "text": "sʜᴀʀᴇ ʟɪɴᴋ ʀᴇɢᴇɴᴇʀᴀᴛɪᴏɴ ʀᴇsᴜʟᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "link": {
+      "text": "ᴅɪʀᴇᴄᴛ sᴛʀᴇᴀᴍ ʟɪɴᴋ sᴛᴀᴛᴜs.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "texts": {
+      "text": "ᴇᴅɪᴛᴀʙʟᴇ ᴍᴇssᴀɢᴇ ᴛᴇᴍᴘʟᴀᴛᴇ ʟɪsᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "edittext": {
+      "text": "ᴍᴇssᴀɢᴇ ᴛᴇᴍᴘʟᴀᴛᴇ ᴇᴅɪᴛᴏʀ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "previewtext": {
+      "text": "ᴍᴇssᴀɢᴇ ᴛᴇᴍᴘʟᴀᴛᴇ ᴘʀᴇᴠɪᴇᴡ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "resettext": {
+      "text": "ᴍᴇssᴀɢᴇ ᴛᴇᴍᴘʟᴀᴛᴇ ʀᴇsᴇᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "buttons": {
+      "text": "ᴛᴇᴍᴘʟᴀᴛᴇ ʙᴜᴛᴛᴏɴ ʟɪsᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "addbutton": {
+      "text": "ᴛᴇᴍᴘʟᴀᴛᴇ ʙᴜᴛᴛᴏɴ ᴀᴅᴅ ʀᴇsᴜʟᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "editbutton": {
+      "text": "ᴛᴇᴍᴘʟᴀᴛᴇ ʙᴜᴛᴛᴏɴ ᴇᴅɪᴛ ʀᴇsᴜʟᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    },
+    "delbutton": {
+      "text": "ᴛᴇᴍᴘʟᴀᴛᴇ ʙᴜᴛᴛᴏɴ ʀᴇᴍᴏᴠᴀʟ ʀᴇsᴜʟᴛ.",
+      "button": {
+        "text": "ᴅᴜᴍᴍʏ ʙᴜᴛᴛᴏɴ",
+        "url": "https://t.me/"
+      }
+    }
+  }
+}
