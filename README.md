@@ -1,16 +1,20 @@
 # File Sharing Bot — private project foundation
 
-This ZIP is the first independently deployable project foundation for the File Sharing Bot master repository. It is **not yet the complete production feature set** described in the product specification. The current code includes a working Telegram application shell, PostgreSQL persistence, small-caps/custom-markup rendering, branded photo-caption replies, message/button editing, single/batch share-link records, Telegram message copying, basic auto-delete, collection listing, delivery analytics, and storage reachability checks.
+This repository contains the independently deployable File Sharing Bot foundation. It is **not yet the complete production feature set** from the command specification. The implemented foundation includes Telegram polling, PostgreSQL persistence, branded photo-caption responses, small-cap/custom-markup rendering, Start/About/Help navigation, message/button editing, single and batch share-link records, Telegram message copying, per-file Close controls, auto-delete, collection listing, delivery analytics, storage reachability checks and Owner-managed per-request file limits.
 
-## Branding image
+## Branding and navigation
 
-Every bot-authored text response is sent as a photo with a caption. The default is the direct raw image URL:
+Every bot-authored text response is sent with the configured branding image and its own permanent Close button. Each individually copied media message also receives its own Close button. Telegram does not allow an independent branding photo to be attached to a document, audio or video message, so file delivery uses a branded photo header followed by individually closable media messages.
 
-`https://raw.githubusercontent.com/Portalsbot/image/main/photo_2026-11-01_20-42-48.jpg`
+The default direct image URL is:
 
-Original link supplied: `https://github.com/Portalsbot/image/blob/main/photo_2026-11-01_20-42-48.jpg`. The GitHub `blob` page is not an image-file URL, so the application uses the corresponding `raw.githubusercontent.com` URL. The image file was not bundled because this build environment could not download external binary content; verify that the repository is public and that Telegram can fetch the raw URL. A local image can be mounted and configured with `BRANDING_IMAGE_PATH`.
+https://raw.githubusercontent.com/Portalsbot/image/main/photo_2026-11-01_20-42-48.jpg
 
-Telegram photo captions are limited to 1024 characters after entity parsing. Long bot text is split into multiple branded photo-caption messages. **Media delivered as files/videos/audio remains separate Telegram media messages**; Telegram cannot attach an independent branding photo to the same document/audio message.
+The original GitHub blob page is not a direct image URL. The repository also contains assets/branding.jpg, which is preferred when available. Set BRANDING_IMAGE_PATH to a mounted JPEG to override the bundled asset, or set BRANDING_IMAGE_URL to the public direct image URL used when no local image is available.
+
+The Start screen includes About and Help navigation plus an optional Channel button. About and Help include a Back action to return to Start. Set CHANNEL_URL to the real public Telegram channel URL; if it is blank, the Channel button is omitted rather than pointing to a dummy destination.
+
+Telegram photo captions are limited to 1024 characters after entity parsing. Long bot text is split into multiple branded photo-caption messages, each with its own Close button.
 
 ## Requirements
 
@@ -21,7 +25,7 @@ Telegram photo captions are limited to 1024 characters after entity parsing. Lon
 
 ## Run locally
 
-```bash
+~~~bash
 python -m venv .venv
 # Windows: .venv\Scripts\activate
 # Linux/macOS: source .venv/bin/activate
@@ -29,47 +33,56 @@ pip install -e .[dev]
 cp .env.example .env
 # Edit .env, then:
 python -m file_sharing_bot.main
-```
+~~~
 
-## Included commands
+## Implemented commands
 
 | Command | Use |
 |---|---|
-| `/start [share_token]` | Start or access a file share link |
-| `/help` | Show commands |
-| `/about` | Show bot information |
-| `/ping` | Health response |
-| `/settings` | Settings overview |
-| `/genlink CHANNEL_ID MESSAGE_ID` | Create a link for one stored message |
-| `/batch CHANNEL_ID FIRST_ID LAST_ID` | Create a range link (up to 100 messages) |
-| `/collections` | List collections |
-| `/collection COLLECTION_ID` | View collection metadata |
-| `/delivery_stats` | Delivery outcomes (admin) |
-| `/dlt_time SECONDS` | Configure auto-delete (admin) |
-| `/storagehealth` | Check central channel reachability (admin) |
-| `/regenerate SHARE_LINK_ID` | Replace a share token (admin) |
-| `/link` | Explains direct-streaming module status |
-| `/texts` | List editable message templates |
-| `/edittext KEY` | Edit one message; then send replacement text |
-| `/previewtext KEY` | Preview a message template |
-| `/resettext KEY` | Restore default text |
-| `/buttons KEY` | Inspect a template's buttons |
-| `/addbutton KEY | LABEL | URL` | Add a URL button |
-| `/editbutton KEY | INDEX | LABEL | URL` | Edit a button (1-based) |
-| `/delbutton KEY | INDEX` | Remove a button (1-based) |
+| /start [share_token] | Open the welcome screen or access a file-share link |
+| /help | Show Help with Start navigation |
+| /about | Show About with Start navigation |
+| /ping | Check whether the bot responds |
+| /settings | Show the authorized management settings overview |
+| /genlink CHANNEL_ID MESSAGE_ID | Create one-file link from the configured storage channel |
+| /batch CHANNEL_ID FIRST_ID LAST_ID | Create a range link (up to 100 messages) |
+| /collections | List existing File Collections (admin) |
+| /collection COLLECTION_ID | View one File Collection (admin) |
+| /delivery_stats | View delivery outcomes (admin) |
+| /dlt_time SECONDS | Configure delivery auto-delete (admin) |
+| /storagehealth | Check central channel reachability and bot membership (admin) |
+| /regenerate SHARE_LINK_ID | Replace an active share token (admin) |
+| /setmaxfiles LIMIT | Change the default per-request file limit (Owner only) |
+| /setmaxfiles USER_ID LIMIT | Set one user's per-request override (Owner only) |
+| /setmaxfiles reset USER_ID | Remove one user's override (Owner only) |
+| /link | Report direct-streaming module status |
+| /texts | List editable message templates (Owner only) |
+| /edittext KEY | Edit one message template (Owner only) |
+| /previewtext KEY | Preview a message template (Owner only) |
+| /resettext KEY | Restore a default text template (Owner only) |
+| /buttons KEY | Inspect template buttons (Owner only) |
+| /addbutton KEY \| LABEL \| URL | Add an HTTP(S) URL button (Owner only) |
+| /editbutton KEY \| INDEX \| LABEL \| URL | Edit a URL button (1-based; Owner only) |
+| /delbutton KEY \| INDEX | Remove a URL button (1-based; Owner only) |
 
 ## Custom formatting
 
-`(B)...(/B)`, `(I)...(/I)`, `(U)...(/U)`, `(S)...(/S)`, `(CODE)...(/CODE)`, `(PRE)...(/PRE)`, `(Q)...(/Q)`, `(SPOILER)...(/SPOILER)` and `(LINK url="https://example.com")...(/LINK)`. Text outside code/pre is converted to the configured Unicode small-caps style. URLs, IDs and code snippets should remain literal.
+The formatter supports B, I, U, S, CODE, PRE, Q, SPOILER and HTTP(S) LINK blocks. Text outside code/pre is converted to the configured Unicode small-caps style. URLs, IDs and code snippets remain literal.
 
-## Important storage limitation
+## Storage and access safeguards
 
-The prototype copies stored channel messages directly using the clone bot's Telegram API identity. That bot must be able to access the official storage channel. The fully automatic token-only central relay is **not implemented in this foundation ZIP** and remains a production integration gate. Do not claim cloning is fully operational until the central storage access/relay test is complete.
+- Link creation is restricted to the configured STORAGE_CHANNEL_ID; the bot will not create share links from arbitrary channels.
+- Deep-link access checks the user's blocked status and the effective per-request file limit.
+- Each copied file has its own Close button. When auto-delete is enabled, each delivered file is scheduled for individual deletion.
+- Collection listing and detail commands require Owner/Admin access.
+- /setmaxfiles is Owner-only and supports a global limit plus per-user overrides.
 
 ## Not yet implemented
 
-Premium billing/expiry workflows, full multi-channel FSub UI, 24-hour verification shortener, direct HTTP streaming server, collection creation/import dashboard, bulk regeneration policies, complete scheduled broadcasts, storage orphan scanner, and production-grade central relay. Tables and interfaces are present where relevant; these items need subsequent implementation and integration tests.
+The full product specification is broader than the current repository foundation. The following require further implementation and integration tests: complete File Collection creation/editing and Link Collection grouping; user and admin management dashboards; bulk link regeneration and per-collection policies; orphan scanning and recovery workflows; scheduled broadcasts; backup/restore/import/export; security dashboards and cooldown controls; complete message/branding management commands; and production-grade central storage relay. Direct HTTP streaming and the token-only relay are also not enabled in this build.
+
+Do not treat a feature as production-ready merely because its command was discussed in the design specification. The implemented command list above is the current code status.
 
 ## License integration note
 
-Before upstream code is copied into the private master repository, retain the source notices and comply with each upstream project's actual LICENSE file. Review GPL/Apache obligations separately. This scaffold does not copy third-party source files wholesale.
+Before upstream code is copied into this private repository, retain source notices and comply with each upstream project's actual LICENSE file. Review GPL/Apache obligations separately. This scaffold does not copy third-party source files wholesale.
