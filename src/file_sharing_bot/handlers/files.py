@@ -145,7 +145,7 @@ async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         """UPDATE file_upload_sessions SET active=FALSE,updated_at=NOW()
                            WHERE clone_id=$1 AND user_id=$2""", clone_id, update.effective_user.id)
                     me = await context.bot.get_me()
-                    body = f"Upload completed: {len(message_ids)} files saved.\\nPermanent access link:\\nhttps://t.me/{me.username}?start={token}"
+                    body = f"Upload completed: {len(message_ids)} files saved.\nPermanent access link:\nhttps://t.me/{me.username}?start={token}"
     await _reply(context, update, body)
 
 
@@ -377,7 +377,7 @@ async def newcollection(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.application.bot_data["db"].require().execute(
             "INSERT INTO file_collections(clone_id,collection_key,title) VALUES($1,$2,$3)",
             context.application.bot_data["clone_id"], key, title)
-        body = f"File Collection created. ID: {key} · {title}\\nAdd existing share-link IDs with /addtocollection {key} LINK_ID."
+        body = f"File Collection created. ID: {key} · {title}\nAdd existing share-link IDs with /addtocollection {key} LINK_ID."
     await _reply(context, update, body)
 
 
@@ -459,8 +459,8 @@ async def link_collection_view(update: Update, context: ContextTypes.DEFAULT_TYP
             "SELECT id,token FROM file_share_links WHERE clone_id=$1 AND id=ANY($2::bigint[]) AND is_active=TRUE ORDER BY id",
             context.application.bot_data["clone_id"], ids)
         me = await context.bot.get_me()
-        body = f"**{row['title']}** · {len(records)} active links\\n\\n" + (
-            "\\n".join(f"Link #{item['id']}: https://t.me/{me.username}?start={item['token']}" for item in records)
+        body = f"**{row['title']}** · {len(records)} active links\n\n" + (
+            "\n".join(f"Link #{item['id']}: https://t.me/{me.username}?start={item['token']}" for item in records)
             if records else "No active share links are attached.")
     await _reply(context, update, body)
 
@@ -515,7 +515,7 @@ async def link_collection_callback(update: Update, context: ContextTypes.DEFAULT
     if action[1] == "add":
         context.user_data["link_collection_action"] = "add"
         await send_branded(context.bot, query.message.chat_id,
-            "Send: COLLECTION NAME | SHARE_LINK_ID SHARE_LINK_ID ...\\nExample: Naruto Season 1 | 12 13 14",
+            "Send: COLLECTION NAME | SHARE_LINK_ID SHARE_LINK_ID ...\nExample: Naruto Season 1 | 12 13 14",
             image_url=context.application.bot_data["image_url"],
             image_path=context.application.bot_data["image_path"],
             small_caps=context.application.bot_data["small_caps"])
@@ -688,8 +688,8 @@ async def users(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rows = await db.fetch(
         "SELECT user_id,is_banned,last_seen FROM bot_users WHERE clone_id=$1 ORDER BY last_seen DESC LIMIT 25",
         clone_id)
-    body = f"**ᴜsᴇʀ ᴅᴀsʜʙᴏᴀʀᴅ** · Total: {total}\\n\\n" + (
-        "\\n".join(f"{row['user_id']} · {'blocked' if row['is_banned'] else 'active'} · {row['last_seen']}" for row in rows)
+    body = f"**ᴜsᴇʀ ᴅᴀsʜʙᴏᴀʀᴅ** · Total: {total}\n\n" + (
+        "\n".join(f"{row['user_id']} · {'blocked' if row['is_banned'] else 'active'} · {row['last_seen']}" for row in rows)
         if rows else "No registered users.")
     await _reply(context, update, body)
 
@@ -702,8 +702,8 @@ async def userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         row = await context.application.bot_data["db"].require().fetchrow(
             "SELECT user_id,first_seen,last_seen,is_banned,max_files_per_request FROM bot_users WHERE clone_id=$1 AND user_id=$2",
             context.application.bot_data["clone_id"], int(context.args[0]))
-        body = (f"User: {row['user_id']}\\nFirst seen: {row['first_seen']}\\nLast seen: {row['last_seen']}\\n"
-                f"Blocked: {row['is_banned']}\\nCustom file limit: {row['max_files_per_request'] or 'default'}") if row else "User not found."
+        body = (f"User: {row['user_id']}\nFirst seen: {row['first_seen']}\nLast seen: {row['last_seen']}\n"
+                f"Blocked: {row['is_banned']}\nCustom file limit: {row['max_files_per_request'] or 'default'}") if row else "User not found."
     await _reply(context, update, body)
 
 
@@ -737,7 +737,7 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         """SELECT COUNT(*) total,COUNT(*) FILTER(WHERE is_banned=TRUE) blocked,
            COUNT(*) FILTER(WHERE last_seen>NOW()-INTERVAL '24 hours') active_24h
            FROM bot_users WHERE clone_id=$1""", context.application.bot_data["clone_id"])
-    await _reply(context, update, f"**sᴛᴀᴛɪsᴛɪᴄs**\\nUsers: {row['total']}\\nBlocked: {row['blocked']}\\nActive in 24h: {row['active_24h']}")
+    await _reply(context, update, f"**sᴛᴀᴛɪsᴛɪᴄs**\nUsers: {row['total']}\nBlocked: {row['blocked']}\nActive in 24h: {row['active_24h']}")
 
 
 async def logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -745,8 +745,8 @@ async def logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rows = await context.application.bot_data["db"].require().fetch(
         """SELECT token,user_id,status,detail,created_at FROM file_delivery_events
            WHERE clone_id=$1 ORDER BY id DESC LIMIT 20""", context.application.bot_data["clone_id"])
-    body = "**ʀᴇᴄᴇɴᴛ ᴅᴇʟɪᴠᴇʀʏ ʟᴏɢs**\\n\\n" + (
-        "\\n".join(f"{r['status']} · user {r['user_id']} · {r['detail'] or ''} · {r['created_at']}" for r in rows)
+    body = "**ʀᴇᴄᴇɴᴛ ᴅᴇʟɪᴠᴇʀʏ ʟᴏɢs**\n\n" + (
+        "\n".join(f"{r['status']} · user {r['user_id']} · {r['detail'] or ''} · {r['created_at']}" for r in rows)
         if rows else "No delivery events.")
     await _reply(context, update, body)
 
@@ -778,8 +778,8 @@ async def recover(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rows = await db.fetch(
             """SELECT user_id,cardinality(message_ids) AS file_count,updated_at FROM file_upload_sessions
                WHERE clone_id=$1 AND active=TRUE ORDER BY updated_at DESC LIMIT 30""", clone_id)
-        body = "**ʀᴇᴄᴏᴠᴇʀᴀʙʟᴇ ᴜᴘʟᴏᴀᴅ sᴇssɪᴏɴs**\\n\\n" + (
-            "\\n".join(f"User {r['user_id']} · {r['file_count']} files · /recover {r['user_id']}" for r in rows)
+        body = "**ʀᴇᴄᴏᴠᴇʀᴀʙʟᴇ ᴜᴘʟᴏᴀᴅ sᴇssɪᴏɴs**\n\n" + (
+            "\n".join(f"User {r['user_id']} · {r['file_count']} files · /recover {r['user_id']}" for r in rows)
             if rows else "No active upload sessions.")
     elif len(context.args) == 1 and context.args[0].isdigit():
         user_id = int(context.args[0])
@@ -800,7 +800,7 @@ async def recover(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         "UPDATE file_upload_sessions SET active=FALSE,updated_at=NOW() WHERE clone_id=$1 AND user_id=$2",
                         clone_id, user_id)
                     me = await context.bot.get_me()
-                    body = f"Recovered {len(ids)} files from user {user_id}.\\nhttps://t.me/{me.username}?start={token}"
+                    body = f"Recovered {len(ids)} files from user {user_id}.\nhttps://t.me/{me.username}?start={token}"
     else:
         body = "Usage: /recover [USER_ID]"
     await _reply(context, update, body)
