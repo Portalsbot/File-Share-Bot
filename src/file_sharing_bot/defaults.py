@@ -9,6 +9,7 @@ DEFAULT_MESSAGES = {
         "Open your collection link to receive its files. If a link does not work or a file is missing, "
         "contact (LINK url="https://t.me/just_astha")ᴀsᴛʜᴀ(/LINK). ♡\n\n"
         "Use /start to return to the welcome screen.\n\n"
+        "/setstoragechannel CHANNEL_ID — configure the central storage channel (Owner only).\n"
         "/upload and /finish — upload files and create a permanent share link.\n"
         "/collections — list File Collections. /newcollection — create one.\n"
         "/collectionpolicy — set per-collection file limits, allowed users, blocked users and expiry.\n"
