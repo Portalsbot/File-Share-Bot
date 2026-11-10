@@ -11,6 +11,7 @@ DEFAULT_MESSAGES = {
         "Use /start to return to the welcome screen.\n\n"
         "/upload and /finish — upload files and create a permanent share link.\n"
         "/collections — list File Collections. /newcollection — create one.\n"
+        "/collectionpolicy — set per-collection file limits, allowed users, blocked users and expiry.\n"
         "/addtocollection and /removefromcollection — manage existing share links.\n"
         "/linkscollection — Owner-only dashboard for permanent collections of existing links.\n"
         "/users, /userinfo, /blockuser, /unblockuser — manage users.\n"
