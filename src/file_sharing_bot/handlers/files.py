@@ -680,6 +680,139 @@ async def setmaxfiles(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     await _reply(context, update, body)
 
+async def users(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    db = context.application.bot_data["db"].require()
+    clone_id = context.application.bot_data["clone_id"]
+    total = await db.fetchval("SELECT COUNT(*) FROM bot_users WHERE clone_id=$1", clone_id)
+    rows = await db.fetch(
+        "SELECT user_id,is_banned,last_seen FROM bot_users WHERE clone_id=$1 ORDER BY last_seen DESC LIMIT 25",
+        clone_id)
+    body = f"**ᴜsᴇʀ ᴅᴀsʜʙᴏᴀʀᴅ** · Total: {total}\\n\\n" + (
+        "\\n".join(f"{row['user_id']} · {'blocked' if row['is_banned'] else 'active'} · {row['last_seen']}" for row in rows)
+        if rows else "No registered users.")
+    await _reply(context, update, body)
+
+
+async def userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if len(context.args) != 1 or not context.args[0].isdigit():
+        body = "Usage: /userinfo USER_ID"
+    else:
+        row = await context.application.bot_data["db"].require().fetchrow(
+            "SELECT user_id,first_seen,last_seen,is_banned,max_files_per_request FROM bot_users WHERE clone_id=$1 AND user_id=$2",
+            context.application.bot_data["clone_id"], int(context.args[0]))
+        body = (f"User: {row['user_id']}\\nFirst seen: {row['first_seen']}\\nLast seen: {row['last_seen']}\\n"
+                f"Blocked: {row['is_banned']}\\nCustom file limit: {row['max_files_per_request'] or 'default'}") if row else "User not found."
+    await _reply(context, update, body)
+
+
+async def blockuser(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if len(context.args) != 1 or not context.args[0].isdigit():
+        body = "Usage: /blockuser USER_ID"
+    else:
+        result = await context.application.bot_data["db"].require().execute(
+            "UPDATE bot_users SET is_banned=TRUE WHERE clone_id=$1 AND user_id=$2",
+            context.application.bot_data["clone_id"], int(context.args[0]))
+        body = "User blocked." if result.endswith("1") else "User not found."
+    await _reply(context, update, body)
+
+
+async def unblockuser(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if len(context.args) != 1 or not context.args[0].isdigit():
+        body = "Usage: /unblockuser USER_ID"
+    else:
+        result = await context.application.bot_data["db"].require().execute(
+            "UPDATE bot_users SET is_banned=FALSE WHERE clone_id=$1 AND user_id=$2",
+            context.application.bot_data["clone_id"], int(context.args[0]))
+        body = "User unblocked." if result.endswith("1") else "User not found."
+    await _reply(context, update, body)
+
+
+async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    row = await context.application.bot_data["db"].require().fetchrow(
+        """SELECT COUNT(*) total,COUNT(*) FILTER(WHERE is_banned=TRUE) blocked,
+           COUNT(*) FILTER(WHERE last_seen>NOW()-INTERVAL '24 hours') active_24h
+           FROM bot_users WHERE clone_id=$1""", context.application.bot_data["clone_id"])
+    await _reply(context, update, f"**sᴛᴀᴛɪsᴛɪᴄs**\\nUsers: {row['total']}\\nBlocked: {row['blocked']}\\nActive in 24h: {row['active_24h']}")
+
+
+async def logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    rows = await context.application.bot_data["db"].require().fetch(
+        """SELECT token,user_id,status,detail,created_at FROM file_delivery_events
+           WHERE clone_id=$1 ORDER BY id DESC LIMIT 20""", context.application.bot_data["clone_id"])
+    body = "**ʀᴇᴄᴇɴᴛ ᴅᴇʟɪᴠᴇʀʏ ʟᴏɢs**\\n\\n" + (
+        "\\n".join(f"{r['status']} · user {r['user_id']} · {r['detail'] or ''} · {r['created_at']}" for r in rows)
+        if rows else "No delivery events.")
+    await _reply(context, update, body)
+
+
+async def bulkmaxfiles(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_owner(update, context): return
+    if len(context.args) < 2 or not context.args[0].isdigit() or not all(x.isdigit() for x in context.args[1:]):
+        body = "Usage: /bulkmaxfiles LIMIT USER_ID USER_ID ..."
+    else:
+        limit = int(context.args[0])
+        ids = list(dict.fromkeys(int(x) for x in context.args[1:]))
+        if limit < 1 or limit > 10000 or len(ids) > 200:
+            body = "Limit must be 1–10000 and at most 200 user IDs can be updated at once."
+        else:
+            for user_id in ids:
+                await context.application.bot_data["db"].require().execute(
+                    """INSERT INTO bot_users(clone_id,user_id,max_files_per_request) VALUES($1,$2,$3)
+                       ON CONFLICT(clone_id,user_id) DO UPDATE SET max_files_per_request=EXCLUDED.max_files_per_request""",
+                    context.application.bot_data["clone_id"], user_id, limit)
+            body = f"Updated the per-request file limit to {limit} for {len(ids)} users."
+    await _reply(context, update, body)
+
+
+async def recover(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    db = context.application.bot_data["db"].require()
+    clone_id = context.application.bot_data["clone_id"]
+    if not context.args:
+        rows = await db.fetch(
+            """SELECT user_id,cardinality(message_ids) AS file_count,updated_at FROM file_upload_sessions
+               WHERE clone_id=$1 AND active=TRUE ORDER BY updated_at DESC LIMIT 30""", clone_id)
+        body = "**ʀᴇᴄᴏᴠᴇʀᴀʙʟᴇ ᴜᴘʟᴏᴀᴅ sᴇssɪᴏɴs**\\n\\n" + (
+            "\\n".join(f"User {r['user_id']} · {r['file_count']} files · /recover {r['user_id']}" for r in rows)
+            if rows else "No active upload sessions.")
+    elif len(context.args) == 1 and context.args[0].isdigit():
+        user_id = int(context.args[0])
+        async with db.acquire() as conn:
+            async with conn.transaction():
+                session = await conn.fetchrow(
+                    """SELECT source_chat_id,message_ids FROM file_upload_sessions
+                       WHERE clone_id=$1 AND user_id=$2 AND active=TRUE FOR UPDATE""", clone_id, user_id)
+                if not session or not session["message_ids"]:
+                    body = "No recoverable files found for that user."
+                else:
+                    token = secrets.token_urlsafe(12)
+                    ids = list(session["message_ids"])
+                    await conn.execute(
+                        """INSERT INTO file_share_links(clone_id,token,source_chat_id,message_ids,created_by)
+                           VALUES($1,$2,$3,$4,$5)""", clone_id, token, session["source_chat_id"], ids, update.effective_user.id)
+                    await conn.execute(
+                        "UPDATE file_upload_sessions SET active=FALSE,updated_at=NOW() WHERE clone_id=$1 AND user_id=$2",
+                        clone_id, user_id)
+                    me = await context.bot.get_me()
+                    body = f"Recovered {len(ids)} files from user {user_id}.\\nhttps://t.me/{me.username}?start={token}"
+    else:
+        body = "Usage: /recover [USER_ID]"
+    await _reply(context, update, body)
+
+
+async def orphans(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    body = ("Full orphan-file scanning is not available through Telegram Bot API: it cannot enumerate a channel's message history. "
+            "The bot can recover active upload sessions with /recover, but a complete storage-channel scan requires an MTProto client or an external storage index.")
+    await _reply(context, update, body)
+
+
 async def stream_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await _reply(
         context, update,
@@ -708,5 +841,14 @@ def add_file_handlers(app):
     app.add_handler(CommandHandler("storagehealth", storagehealth))
     app.add_handler(CommandHandler("regenerate", regenerate))
     app.add_handler(CommandHandler("setmaxfiles", setmaxfiles))
+    app.add_handler(CommandHandler("bulkmaxfiles", bulkmaxfiles))
+    app.add_handler(CommandHandler("users", users))
+    app.add_handler(CommandHandler("userinfo", userinfo))
+    app.add_handler(CommandHandler("blockuser", blockuser))
+    app.add_handler(CommandHandler("unblockuser", unblockuser))
+    app.add_handler(CommandHandler("stats", stats))
+    app.add_handler(CommandHandler("logs", logs))
+    app.add_handler(CommandHandler("recover", recover))
+    app.add_handler(CommandHandler("orphans", orphans))
     app.add_handler(CommandHandler("link", stream_link))
     app.add_handler(CommandHandler("start", deliver), group=1)
