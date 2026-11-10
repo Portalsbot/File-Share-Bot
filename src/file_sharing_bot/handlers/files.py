@@ -313,7 +313,12 @@ async def collectionpolicy(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def deliver(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args or not update.effective_user:
         return
-    token = context.args[0]
+    await deliver_token(update, context, context.args[0])
+
+
+async def deliver_token(update: Update, context: ContextTypes.DEFAULT_TYPE, token: str):
+    if not update.effective_user:
+        return
     db = context.application.bot_data["db"]
     clone_id = context.application.bot_data["clone_id"]
     user_id = update.effective_user.id
