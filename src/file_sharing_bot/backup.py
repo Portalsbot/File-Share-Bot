@@ -8,8 +8,8 @@ from telegram.ext import ContextTypes, CommandHandler, MessageHandler, filters
 from .branding import send_branded, close_keyboard
 
 
-TABLES = ["bot_message_templates","bot_message_buttons","bot_users","file_share_links","file_delivery_events","file_collections","file_settings","file_upload_sessions","file_link_collections"]
-SERIAL_TABLES = ["file_share_links","file_delivery_events","file_collections","file_link_collections"]
+TABLES = ["bot_message_templates","bot_message_buttons","bot_users","file_share_links","file_delivery_events","file_collections","file_settings","file_upload_sessions","file_link_collections","bot_broadcasts"]
+SERIAL_TABLES = ["file_share_links","file_delivery_events","file_collections","file_link_collections","bot_broadcasts"]
 PRODUCT = "file"
 SETTING_TABLE = "file_settings"
 BACKUP_SETTING = "backup_channel_id"
