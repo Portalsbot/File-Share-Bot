@@ -136,6 +136,7 @@ async def configure_command_menu(app):
         BotCommand("collections", "List File Collections"),
         BotCommand("collection", "View a File Collection"),
         BotCommand("newcollection", "Create a File Collection"),
+        BotCommand("collectionpolicy", "Set File Collection access rules"),
         BotCommand("addtocollection", "Add a share link to a collection"),
         BotCommand("removefromcollection", "Remove a share link from a collection"),
         BotCommand("editcollection", "Rename a File Collection"),
