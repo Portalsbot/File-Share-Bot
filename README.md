@@ -49,7 +49,23 @@ python -m file_sharing_bot.main
 | /genlink CHANNEL_ID MESSAGE_ID | Create one-file link from the configured storage channel |
 | /batch CHANNEL_ID FIRST_ID LAST_ID | Create a range link (up to 100 messages) |
 | /collections | List existing File Collections (admin) |
-| /collection COLLECTION_ID | View one File Collection (admin) |
+| /collection COLLECTION_ID | View one File Collection and its existing public links (admin) |
+| /newcollection TITLE | Create a File Collection |
+| /addtocollection COLLECTION_ID SHARE_LINK_ID | Attach an existing share link |
+| /removefromcollection COLLECTION_ID SHARE_LINK_ID | Remove an existing share link |
+| /editcollection COLLECTION_ID NEW TITLE | Rename a File Collection |
+| /deletecollection COLLECTION_ID | Delete a File Collection without deleting its links |
+| /collectionpolicy COLLECTION_ID ... | Enforce per-collection file limits, user allow/deny lists and expiry |
+| /linkscollection | Owner-only dashboard for permanent indexes of existing public links |
+| /users, /userinfo USER_ID | View registered users and account status |
+| /blockuser USER_ID, /unblockuser USER_ID | Restrict or restore a user |
+| /bulkmaxfiles LIMIT USER_ID ... | Set limits for up to 200 users |
+| /recover [USER_ID] | List or finalize interrupted upload sessions |
+| /orphans | Explain storage-channel orphan-scan limitation |
+| /broadcast, /broadcasts, /cancelbroadcast ID | Create, schedule and manage broadcasts |
+| /setbackupchannel CHANNEL_ID | Configure the Telegram backup channel |
+| /backup, /backups, /restore ID CONFIRM | Back up and restore bot data |
+| /exportdata, /importdata | Export or import a validated JSON backup |
 | /delivery_stats | View delivery outcomes (admin) |
 | /dlt_time SECONDS | Configure delivery auto-delete (admin) |
 | /storagehealth | Check central channel reachability and bot membership (admin) |
