@@ -89,3 +89,10 @@ Do not treat a feature as production-ready merely because its command was discus
 
 Before upstream code is copied into this private repository, retain source notices and comply with each upstream project's actual LICENSE file. Review GPL/Apache obligations separately. This scaffold does not copy third-party source files wholesale.
 \n## Upload workflow\n\n- `/upload` starts a persistent Owner/Admin upload session and copies each received file into the configured storage channel.\n- Send up to 100 supported media messages, then use `/finish` to create one permanent File Sharing Bot deep link for the uploaded set.\n- The upload session is stored in PostgreSQL, so the session record survives a bot restart. Use the inline Cancel button to abandon the session.\n- The bot must be an administrator in the storage channel with permission to post messages.\n
+
+## Collections
+
+- `/newcollection TITLE` creates a File Collection.
+- `/addtocollection COLLECTION_ID SHARE_LINK_ID` and `/removefromcollection COLLECTION_ID SHARE_LINK_ID` manage references to existing share links.
+- `/editcollection COLLECTION_ID NEW TITLE` renames a collection; `/deletecollection COLLECTION_ID` deletes only the collection record, not the underlying share links.
+- `/linkscollection` opens the Owner-only dashboard for permanent named collections of existing public share links. Its Add flow accepts `COLLECTION NAME | SHARE_LINK_ID SHARE_LINK_ID ...`. The All Collections view opens the saved public links; deleting a Link Collection never deletes the underlying share links.
