@@ -68,7 +68,8 @@ python -m file_sharing_bot.main
 | /exportdata, /importdata | Export or import a validated JSON backup |
 | /delivery_stats | View delivery outcomes (admin) |
 | /dlt_time SECONDS | Configure delivery auto-delete (admin) |
-| /setstoragechannel CHANNEL_ID | Configure central storage channel (Owner only) |\n| /storagehealth | Check central channel reachability and bot membership (admin) |
+| /setstoragechannel CHANNEL_ID | Configure central storage channel (Owner only) |
+| /storagehealth | Check central channel reachability and bot membership (admin) |
 | /regenerate SHARE_LINK_ID | Replace an active share token (admin) |
 | /setmaxfiles LIMIT | Change the default per-request file limit (Owner only) |
 | /setmaxfiles USER_ID LIMIT | Set one user's per-request override (Owner only) |
