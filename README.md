@@ -40,6 +40,8 @@ python -m file_sharing_bot.main
 | Command | Use |
 |---|---|
 | /start [share_token] | Open the welcome screen or access a file-share link |
+| /upload | Start a persistent Owner/Admin upload session (up to 100 files) |
+| /finish | Finish the current upload session and create its permanent access link |
 | /help | Show Help with Start navigation |
 | /about | Show About with Start navigation |
 | /ping | Check whether the bot responds |
