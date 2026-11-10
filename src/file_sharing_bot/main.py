@@ -34,6 +34,8 @@ async def post_init(app):
         "SELECT setting_key, setting_value FROM file_settings WHERE clone_id=$1", settings.clone_id
     )
     saved = {row["setting_key"]: row["setting_value"] for row in rows}
+    if saved.get("storage_channel_id"):
+        app.bot_data["storage_channel_id"] = int(saved["storage_channel_id"])
     app.bot_data["default_auto_delete"] = int(saved.get("auto_delete", settings.default_auto_delete))
     app.bot_data["max_files_per_user"] = int(saved.get("max_files_per_user", settings.max_files_per_user))
     await db.require().execute(
