@@ -8,9 +8,9 @@ Every bot-authored text response is sent with the configured branding image and 
 
 The default direct image URL is:
 
-https://raw.githubusercontent.com/Portalsbot/image/main/photo_2026-11-01_20-42-48.jpg
+https://i.ibb.co/PGpMYwYY/Gemini-Generated-Image-a7tjlia7tjlia7tj.png
 
-The original GitHub blob page is not a direct image URL. The repository also contains assets/branding.jpg, which is preferred when available. Set BRANDING_IMAGE_PATH to a mounted JPEG to override the bundled asset, or set BRANDING_IMAGE_URL to the public direct image URL used when no local image is available.
+The original GitHub blob page is not a direct image URL. The configured BRANDING_IMAGE_URL is used by default. Set BRANDING_IMAGE_PATH only when you intentionally want to use a local JPEG instead.
 
 The Start screen includes About and Help navigation plus an optional Channel button. About and Help include a Back action to return to Start. Set CHANNEL_URL to the real public Telegram channel URL; if it is blank, the Channel button is omitted rather than pointing to a dummy destination.
 

@@ -7,12 +7,11 @@ from file_sharing_bot import branding
 def test_branded_sender_adds_close_without_dummy_button(monkeypatch, tmp_path):
     photo = tmp_path / "branding.jpg"
     photo.write_bytes(b"fake-image")
-    monkeypatch.setattr(branding, "IMAGE_PATH", photo)
     bot = SimpleNamespace(send_photo=AsyncMock(return_value=SimpleNamespace(message_id=1)))
     custom = InlineKeyboardMarkup([[InlineKeyboardButton("ABOUT", callback_data="nav:about")]])
     asyncio.run(branding.send_branded(
         bot, 123, "Hello", image_url="https://example.com/image.jpg",
-        reply_markup=custom, small_caps=True,
+        reply_markup=custom, small_caps=True, image_path=str(photo),
     ))
     markup = bot.send_photo.await_args.kwargs["reply_markup"]
     buttons = [button for row in markup.inline_keyboard for button in row]
@@ -29,8 +28,17 @@ def test_every_caption_chunk_has_close(monkeypatch, tmp_path):
     bot = SimpleNamespace(send_photo=AsyncMock(side_effect=[
         SimpleNamespace(message_id=1), SimpleNamespace(message_id=2)
     ]))
-    asyncio.run(branding.send_branded(bot, 123, "x" * 900, image_url="https://example.com/image.jpg"))
+    asyncio.run(branding.send_branded(bot, 123, "x" * 900, image_url="https://example.com/image.jpg", image_path=str(photo)))
     assert bot.send_photo.await_count == 2
     for call in bot.send_photo.await_args_list:
         buttons = [button for row in call.kwargs["reply_markup"].inline_keyboard for button in row]
         assert sum(button.callback_data == branding.CLOSE_CALLBACK_DATA for button in buttons) == 1
+
+
+def test_default_uses_configured_remote_branding_url(monkeypatch):
+    bot = SimpleNamespace(send_photo=AsyncMock(return_value=SimpleNamespace(message_id=3)))
+    asyncio.run(branding.send_branded(
+        bot, 123, "Hello",
+        image_url="https://i.ibb.co/PGpMYwYY/Gemini-Generated-Image-a7tjlia7tjlia7tj.png",
+    ))
+    assert bot.send_photo.await_args.kwargs["photo"] == "https://i.ibb.co/PGpMYwYY/Gemini-Generated-Image-a7tjlia7tjlia7tj.png"
