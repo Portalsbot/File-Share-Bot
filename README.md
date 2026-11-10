@@ -79,11 +79,20 @@ The formatter supports B, I, U, S, CODE, PRE, Q, SPOILER and HTTP(S) LINK blocks
 - Collection listing and detail commands require Owner/Admin access.
 - /setmaxfiles is Owner-only and supports a global limit plus per-user overrides.
 
-## Not yet implemented
+## Current implemented management features
 
-The full product specification is broader than the current repository foundation. The following require further implementation and integration tests: complete File Collection creation/editing and Link Collection grouping; user and admin management dashboards; bulk link regeneration and per-collection policies; orphan scanning and recovery workflows; scheduled broadcasts; backup/restore/import/export; security dashboards and cooldown controls; complete message/branding management commands; and production-grade central storage relay. Direct HTTP streaming and the token-only relay are also not enabled in this build.
+- File Collections support creation, rename, deletion, adding/removing existing share-link IDs, and viewing their existing public links.
+- `/collectionpolicy` enforces per-collection maximum file counts, allowed-user lists, blocked-user lists, disable switches and expiry timestamps during delivery.
+- `/linkscollection` is an Owner-only persistent index of existing share links. Deleting an index does not delete the original links.
+- User management includes listing, inspection, block/unblock and bulk per-user file limits.
+- `/recover` lists and finalizes interrupted upload sessions. `/orphans` explains the storage scan limitation rather than pretending it can inspect channel history.
+- Text/media broadcasts support URL buttons, immediate delivery, durable scheduled delivery, reports and cancellation.
+- Telegram-channel backups, JSON export/import and Owner-confirmed restore are implemented. Configure `/setbackupchannel` before relying on remote backups.
+- Admin command menus are published automatically when the bot starts. The HTTP health endpoint is `/health` when a `PORT` environment variable is supplied.
 
-Do not treat a feature as production-ready merely because its command was discussed in the design specification. The implemented command list above is the current code status.
+## Known limitations requiring your environment
+
+Telegram Bot API does not provide channel-history enumeration. A complete orphan scan requires a separately configured MTProto client or an external storage index; do not share a Telegram user session string in chat. Direct HTTP streaming is not enabled in this build. Backups are limited by Telegram's document upload/download limits and should be complemented by PostgreSQL-native backups for large databases.
 
 ## License integration note
 
