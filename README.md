@@ -121,3 +121,7 @@ Before upstream code is copied into this private repository, retain source notic
 - `/addtocollection COLLECTION_ID SHARE_LINK_ID` and `/removefromcollection COLLECTION_ID SHARE_LINK_ID` manage references to existing share links.
 - `/editcollection COLLECTION_ID NEW TITLE` renames a collection; `/deletecollection COLLECTION_ID` deletes only the collection record, not the underlying share links.
 - `/linkscollection` opens the Owner-only dashboard for permanent named collections of existing public share links. Its Add flow accepts `COLLECTION NAME | SHARE_LINK_ID SHARE_LINK_ID ...`. The All Collections view opens the saved public links; deleting a Link Collection never deletes the underlying share links.
+
+## Web-service health check
+
+When deploying as a web service, the platform-provided `PORT` variable starts a lightweight HTTP server. Configure the platform health-check path as `/health`. This endpoint reports process liveness; it does not prove Telegram or PostgreSQL connectivity. Use `/storagehealth` and `/ping` inside Telegram for those checks.
