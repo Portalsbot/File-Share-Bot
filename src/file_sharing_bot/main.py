@@ -11,6 +11,7 @@ from .message_editor.handlers import add_editor_handlers
 from .handlers.files import add_file_handlers
 from .errors import error_handler
 from .branding import close_branded_message
+from .backup import add_backup_handlers
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -59,6 +60,7 @@ def main():
     add_common_handlers(app)
     add_editor_handlers(app)
     add_file_handlers(app)
+    add_backup_handlers(app)
     app.add_error_handler(error_handler)
     app.run_polling(allowed_updates=["message", "callback_query", "chat_member"])
 
