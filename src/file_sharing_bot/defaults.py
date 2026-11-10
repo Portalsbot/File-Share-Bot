@@ -12,10 +12,10 @@ DEFAULT_MESSAGES = {
         "/upload and /finish — upload files and create a permanent share link.\n"
         "/collections — list File Collections. /newcollection — create one.\n"
         "/addtocollection and /removefromcollection — manage existing share links.\n"
-        "/linkscollection — Owner-only dashboard for permanent collections of existing links.\\n"
-        "/users, /userinfo, /blockuser, /unblockuser — manage users.\\n"
-        "/broadcast, /broadcasts, /cancelbroadcast — send and schedule announcements.\\n"
-        "/backup, /backups, /restore — protect and restore bot data.\\n"
+        "/linkscollection — Owner-only dashboard for permanent collections of existing links.\n"
+        "/users, /userinfo, /blockuser, /unblockuser — manage users.\n"
+        "/broadcast, /broadcasts, /cancelbroadcast — send and schedule announcements.\n"
+        "/backup, /backups, /restore — protect and restore bot data.\n"
         "/exportdata and /importdata — move a validated JSON backup."
     ),
     "file.about": (
