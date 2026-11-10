@@ -688,6 +688,33 @@ async def dlt_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
             body = f"Auto-delete set to {seconds} seconds."
     await _reply(context, update, body)
 
+async def setstoragechannel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_owner(update, context): return
+    if len(context.args) != 1 or not context.args[0].lstrip("-").isdigit():
+        body = "Usage: /setstoragechannel CHANNEL_ID"
+    else:
+        channel_id = int(context.args[0])
+        try:
+            chat = await context.bot.get_chat(channel_id)
+            me = await context.bot.get_me()
+            member = await context.bot.get_chat_member(channel_id, me.id)
+            if getattr(member, "status", "") not in {"administrator", "creator"}:
+                raise PermissionError("The bot must be an administrator in the storage channel.")
+            if getattr(member, "can_post_messages", True) is False:
+                raise PermissionError("The bot needs permission to post in the storage channel.")
+            await context.application.bot_data["db"].require().execute(
+                """INSERT INTO file_settings(clone_id,setting_key,setting_value)
+                   VALUES($1,'storage_channel_id',$2)
+                   ON CONFLICT(clone_id,setting_key)
+                   DO UPDATE SET setting_value=EXCLUDED.setting_value,updated_at=NOW()""",
+                context.application.bot_data["clone_id"], str(channel_id))
+            context.application.bot_data["storage_channel_id"] = channel_id
+            body = f"Storage channel configured: {chat.title or channel_id} ({channel_id})."
+        except Exception as exc:
+            body = f"Storage channel was not changed: {type(exc).__name__}: {str(exc)[:150]}"
+    await _reply(context, update, body)
+
+
 async def storagehealth(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _is_admin(update, context):
         return
@@ -935,6 +962,7 @@ def add_file_handlers(app):
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, link_collection_input), group=1)
     app.add_handler(CommandHandler("delivery_stats", delivery_stats))
     app.add_handler(CommandHandler("dlt_time", dlt_time))
+    app.add_handler(CommandHandler("setstoragechannel", setstoragechannel))
     app.add_handler(CommandHandler("storagehealth", storagehealth))
     app.add_handler(CommandHandler("regenerate", regenerate))
     app.add_handler(CommandHandler("setmaxfiles", setmaxfiles))
