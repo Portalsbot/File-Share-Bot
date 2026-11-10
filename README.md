@@ -86,3 +86,4 @@ Do not treat a feature as production-ready merely because its command was discus
 ## License integration note
 
 Before upstream code is copied into this private repository, retain source notices and comply with each upstream project's actual LICENSE file. Review GPL/Apache obligations separately. This scaffold does not copy third-party source files wholesale.
+\n## Upload workflow\n\n- `/upload` starts a persistent Owner/Admin upload session and copies each received file into the configured storage channel.\n- Send up to 100 supported media messages, then use `/finish` to create one permanent File Sharing Bot deep link for the uploaded set.\n- The upload session is stored in PostgreSQL, so the session record survives a bot restart. Use the inline Cancel button to abandon the session.\n- The bot must be an administrator in the storage channel with permission to post messages.\n
