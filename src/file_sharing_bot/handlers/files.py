@@ -1,5 +1,6 @@
 from __future__ import annotations
 import logging
+import json
 import secrets
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import MessageHandler, CallbackQueryHandler, filters
@@ -357,6 +358,191 @@ async def collection(update: Update, context: ContextTypes.DEFAULT_TYPE):
             body = "Collection not found."
     await _reply(context, update, body)
 
+async def newcollection(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    title = " ".join(context.args).strip()
+    if not title:
+        body = "Usage: /newcollection COLLECTION NAME"
+    else:
+        key = "COL-" + secrets.token_hex(3).upper()
+        await context.application.bot_data["db"].require().execute(
+            "INSERT INTO file_collections(clone_id,collection_key,title) VALUES($1,$2,$3)",
+            context.application.bot_data["clone_id"], key, title)
+        body = f"File Collection created. ID: {key} · {title}\\nAdd existing share-link IDs with /addtocollection {key} LINK_ID."
+    await _reply(context, update, body)
+
+
+async def addtocollection(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if len(context.args) != 2 or not context.args[1].isdigit():
+        body = "Usage: /addtocollection COLLECTION_ID SHARE_LINK_ID"
+    else:
+        db = context.application.bot_data["db"].require()
+        clone_id, key, link_id = context.application.bot_data["clone_id"], context.args[0], int(context.args[1])
+        link = await db.fetchrow("SELECT id FROM file_share_links WHERE clone_id=$1 AND id=$2 AND is_active=TRUE", clone_id, link_id)
+        row = await db.fetchrow("SELECT metadata FROM file_collections WHERE clone_id=$1 AND collection_key=$2", clone_id, key)
+        if not row: body = "File Collection not found."
+        elif not link: body = "Active share link not found."
+        else:
+            metadata = row["metadata"] if isinstance(row["metadata"], dict) else json.loads(row["metadata"] or "{}")
+            ids = list(dict.fromkeys([int(x) for x in metadata.get("link_ids", [])] + [link_id]))
+            metadata["link_ids"] = ids
+            await db.execute("UPDATE file_collections SET metadata=$1::jsonb WHERE clone_id=$2 AND collection_key=$3",
+                             json.dumps(metadata), clone_id, key)
+            body = f"Share link #{link_id} added to {key}. Total links: {len(ids)}."
+    await _reply(context, update, body)
+
+
+async def removefromcollection(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if len(context.args) != 2 or not context.args[1].isdigit():
+        body = "Usage: /removefromcollection COLLECTION_ID SHARE_LINK_ID"
+    else:
+        db = context.application.bot_data["db"].require()
+        key, link_id = context.args[0], int(context.args[1])
+        row = await db.fetchrow("SELECT metadata FROM file_collections WHERE clone_id=$1 AND collection_key=$2",
+                                context.application.bot_data["clone_id"], key)
+        if not row: body = "File Collection not found."
+        else:
+            metadata = row["metadata"] if isinstance(row["metadata"], dict) else json.loads(row["metadata"] or "{}")
+            ids = [int(x) for x in metadata.get("link_ids", []) if int(x) != link_id]
+            metadata["link_ids"] = ids
+            await db.execute("UPDATE file_collections SET metadata=$1::jsonb WHERE clone_id=$2 AND collection_key=$3",
+                             json.dumps(metadata), context.application.bot_data["clone_id"], key)
+            body = f"Share link #{link_id} removed from {key}."
+    await _reply(context, update, body)
+
+
+async def editcollection(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if len(context.args) < 2:
+        body = "Usage: /editcollection COLLECTION_ID NEW NAME"
+    else:
+        key, title = context.args[0], " ".join(context.args[1:])
+        result = await context.application.bot_data["db"].require().execute(
+            "UPDATE file_collections SET title=$1 WHERE clone_id=$2 AND collection_key=$3",
+            title, context.application.bot_data["clone_id"], key)
+        body = "Collection name updated." if result.endswith("1") else "Collection not found."
+    await _reply(context, update, body)
+
+
+async def deletecollection(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if len(context.args) != 1:
+        body = "Usage: /deletecollection COLLECTION_ID"
+    else:
+        result = await context.application.bot_data["db"].require().execute(
+            "DELETE FROM file_collections WHERE clone_id=$1 AND collection_key=$2",
+            context.application.bot_data["clone_id"], context.args[0])
+        body = "File Collection deleted. Its original share links remain active." if result.endswith("1") else "Collection not found."
+    await _reply(context, update, body)
+
+
+async def link_collection_view(update: Update, context: ContextTypes.DEFAULT_TYPE, collection_id: int):
+    db = context.application.bot_data["db"].require()
+    row = await db.fetchrow("SELECT title,link_ids FROM file_link_collections WHERE clone_id=$1 AND id=$2",
+                            context.application.bot_data["clone_id"], collection_id)
+    if not row:
+        body = "Link Collection not found."
+    else:
+        ids = list(row["link_ids"] or [])
+        records = await db.fetch(
+            "SELECT id,token FROM file_share_links WHERE clone_id=$1 AND id=ANY($2::bigint[]) AND is_active=TRUE ORDER BY id",
+            context.application.bot_data["clone_id"], ids)
+        me = await context.bot.get_me()
+        body = f"**{row['title']}** · {len(records)} active links\\n\\n" + (
+            "\\n".join(f"Link #{item['id']}: https://t.me/{me.username}?start={item['token']}" for item in records)
+            if records else "No active share links are attached.")
+    await _reply(context, update, body)
+
+
+async def linkscollection(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_owner(update, context): return
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("· ᴀᴅᴅ ·", callback_data="linkcol:add"),
+         InlineKeyboardButton("· ᴅᴇʟᴇᴛᴇ ·", callback_data="linkcol:delete")],
+        [InlineKeyboardButton("· ᴀʟʟ ᴄᴏʟʟᴇᴄᴛɪᴏɴs ·", callback_data="linkcol:all")],
+    ])
+    await _reply(context, update, "Manage your permanent index of existing public file-share links.", markup)
+
+
+async def link_collection_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_owner(update, context) or context.user_data.get("link_collection_action") != "add":
+        return
+    context.user_data.pop("link_collection_action", None)
+    raw = (update.effective_message.text or "").strip()
+    if "|" not in raw:
+        await _reply(context, update, "Format: COLLECTION NAME | SHARE_LINK_ID SHARE_LINK_ID ...")
+        return
+    title, raw_ids = [part.strip() for part in raw.split("|", 1)]
+    try:
+        ids = list(dict.fromkeys(int(x) for x in raw_ids.split()))
+        if not title or not ids or len(ids) > 100 or any(x <= 0 for x in ids):
+            raise ValueError
+        rows = await context.application.bot_data["db"].require().fetch(
+            "SELECT id FROM file_share_links WHERE clone_id=$1 AND id=ANY($2::bigint[]) AND is_active=TRUE",
+            context.application.bot_data["clone_id"], ids)
+        valid = {int(row["id"]) for row in rows}
+        if valid != set(ids):
+            raise ValueError("One or more share-link IDs do not exist or are inactive.")
+        key = "LNK-" + secrets.token_hex(3).upper()
+        await context.application.bot_data["db"].require().execute(
+            "INSERT INTO file_link_collections(clone_id,collection_key,title,link_ids,created_by) VALUES($1,$2,$3,$4,$5)",
+            context.application.bot_data["clone_id"], key, title, ids, update.effective_user.id)
+        await _reply(context, update, f"Link Collection created: {title} · {key} · {len(ids)} existing links indexed.")
+    except Exception as exc:
+        await _reply(context, update, f"Could not create Link Collection: {str(exc)[:160]}")
+
+
+async def link_collection_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    if not query: return
+    if query.from_user.id != context.application.bot_data["owner_id"]:
+        await query.answer("Owner only.", show_alert=True)
+        return
+    await query.answer()
+    action = query.data.split(":")
+    if action[1] == "add":
+        context.user_data["link_collection_action"] = "add"
+        await send_branded(context.bot, query.message.chat_id,
+            "Send: COLLECTION NAME | SHARE_LINK_ID SHARE_LINK_ID ...\\nExample: Naruto Season 1 | 12 13 14",
+            image_url=context.application.bot_data["image_url"],
+            image_path=context.application.bot_data["image_path"],
+            small_caps=context.application.bot_data["small_caps"])
+    elif action[1] == "all":
+        rows = await context.application.bot_data["db"].require().fetch(
+            "SELECT id,title,collection_key,cardinality(link_ids) AS count FROM file_link_collections WHERE clone_id=$1 ORDER BY id DESC LIMIT 50",
+            context.application.bot_data["clone_id"])
+        buttons = [[InlineKeyboardButton(f"{row['title']} · {row['count']} links", callback_data=f"linkcol:view:{row['id']}")]
+                   for row in rows]
+        await send_branded(context.bot, query.message.chat_id,
+            "All Link Collections:" if rows else "No Link Collections have been created.",
+            image_url=context.application.bot_data["image_url"], image_path=context.application.bot_data["image_path"],
+            small_caps=context.application.bot_data["small_caps"],
+            reply_markup=InlineKeyboardMarkup(buttons) if buttons else None)
+    elif action[1] == "delete":
+        rows = await context.application.bot_data["db"].require().fetch(
+            "SELECT id,title FROM file_link_collections WHERE clone_id=$1 ORDER BY id DESC LIMIT 50",
+            context.application.bot_data["clone_id"])
+        buttons = [[InlineKeyboardButton(f"· {row['title']} ·", callback_data=f"linkcol:del:{row['id']}")]
+                   for row in rows]
+        await send_branded(context.bot, query.message.chat_id,
+            "Choose a Link Collection to delete:" if rows else "No Link Collections to delete.",
+            image_url=context.application.bot_data["image_url"], image_path=context.application.bot_data["image_path"],
+            small_caps=context.application.bot_data["small_caps"],
+            reply_markup=InlineKeyboardMarkup(buttons) if buttons else None)
+    elif action[1] == "view" and len(action) == 3 and action[2].isdigit():
+        await link_collection_view(update, context, int(action[2]))
+    elif action[1] == "del" and len(action) == 3 and action[2].isdigit():
+        result = await context.application.bot_data["db"].require().execute(
+            "DELETE FROM file_link_collections WHERE clone_id=$1 AND id=$2",
+            context.application.bot_data["clone_id"], int(action[2]))
+        await send_branded(context.bot, query.message.chat_id,
+            "Link Collection deleted. Original share links remain unchanged." if result.endswith("1") else "Collection not found.",
+            image_url=context.application.bot_data["image_url"], image_path=context.application.bot_data["image_path"],
+            small_caps=context.application.bot_data["small_caps"])
+
+
 async def delivery_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _is_admin(update, context):
         return
@@ -499,6 +685,14 @@ def add_file_handlers(app):
     app.add_handler(CommandHandler("batch", batch))
     app.add_handler(CommandHandler("collections", collections))
     app.add_handler(CommandHandler("collection", collection))
+    app.add_handler(CommandHandler("newcollection", newcollection))
+    app.add_handler(CommandHandler("addtocollection", addtocollection))
+    app.add_handler(CommandHandler("removefromcollection", removefromcollection))
+    app.add_handler(CommandHandler("editcollection", editcollection))
+    app.add_handler(CommandHandler("deletecollection", deletecollection))
+    app.add_handler(CommandHandler("linkscollection", linkscollection))
+    app.add_handler(CallbackQueryHandler(link_collection_callback, pattern=r"^linkcol:"))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, link_collection_input), group=1)
     app.add_handler(CommandHandler("delivery_stats", delivery_stats))
     app.add_handler(CommandHandler("dlt_time", dlt_time))
     app.add_handler(CommandHandler("storagehealth", storagehealth))
