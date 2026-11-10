@@ -12,6 +12,7 @@ from .handlers.files import add_file_handlers
 from .errors import error_handler
 from .branding import close_branded_message
 from .backup import add_backup_handlers
+from .broadcast import add_broadcast_handlers
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -32,6 +33,15 @@ async def post_init(app):
     saved = {row["setting_key"]: row["setting_value"] for row in rows}
     app.bot_data["default_auto_delete"] = int(saved.get("auto_delete", settings.default_auto_delete))
     app.bot_data["max_files_per_user"] = int(saved.get("max_files_per_user", settings.max_files_per_user))
+    await db.require().execute(
+        """UPDATE bot_broadcasts SET status='failed',
+           error_detail=COALESCE(error_detail,'Worker restarted during delivery; recipient outcome is unknown.'),
+           finished_at=NOW() WHERE clone_id=$1 AND status='processing'""",
+        settings.clone_id)
+    if app.job_queue is None:
+        raise RuntimeError("PTB JobQueue is required for scheduled broadcasts and file auto-delete.")
+    from .broadcast import broadcast_worker
+    app.job_queue.run_repeating(broadcast_worker, interval=10, first=3, name="scheduled-broadcasts")
 
 async def post_shutdown(app):
     db = app.bot_data.get("db")
@@ -61,6 +71,7 @@ def main():
     add_editor_handlers(app)
     add_file_handlers(app)
     add_backup_handlers(app)
+    add_broadcast_handlers(app)
     app.add_error_handler(error_handler)
     app.run_polling(allowed_updates=["message", "callback_query", "chat_member"])
 
