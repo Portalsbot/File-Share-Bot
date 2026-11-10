@@ -1,1 +1,26 @@
-DEFAULT_MESSAGES = {'file.start': 'ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴏᴜʀ ғɪʟᴇ sʜᴀʀɪɴɢ ʙᴏᴛ!\n\nᴜsᴇ ʏᴏᴜʀ sʜᴀʀᴇᴀʙʟᴇ ʟɪɴᴋ ᴛᴏ ᴀᴄᴄᴇss ʏᴏᴜʀ ғɪʟᴇs.', 'file.help': '**ғɪʟᴇ sʜᴀʀɪɴɢ ʜᴇʟᴘ**\n\n/start — open a share link\n/genlink CHANNEL_ID MESSAGE_ID — create one-file link\n/batch CHANNEL_ID FIRST_ID LAST_ID — create a batch link\n/collections — view collections\n/delivery_stats — view delivery analytics\n/texts — edit bot messages', 'file.about': 'ᴏғғɪᴄɪᴀʟ ғɪʟᴇ sʜᴀʀɪɴɢ ʙᴏᴛ.', 'file.link_created': '✅ ʏᴏᴜʀ sʜᴀʀᴇᴀʙʟᴇ ғɪʟᴇ ʟɪɴᴋ ɪs ʀᴇᴀᴅʏ:\n{url}', 'file.delivery_started': 'ᴘʀᴇᴘᴀʀɪɴɢ ʏᴏᴜʀ ғɪʟᴇs. ᴛʜᴇ ᴍᴇᴅɪᴀ ᴡɪʟʟ ᴀʀʀɪᴠᴇ ɪɴ sᴇᴘᴀʀᴀᴛᴇ ᴛᴇʟᴇɢʀᴀᴍ ᴍᴇssᴀɢᴇs.', 'file.expired': 'ᴛʜɪs sʜᴀʀᴇ ʟɪɴᴋ ɪs ɴᴏ ʟᴏɴɢᴇʀ ᴀᴠᴀɪʟᴀʙʟᴇ.', 'file.invalid': 'ɪɴᴠᴀʟɪᴅ ғɪʟᴇ ʟɪɴᴋ.', 'file.collection_list': '**ᴄᴏʟʟᴇᴄᴛɪᴏɴs**\n{items}'}
+DEFAULT_MESSAGES = {
+    "file.start": (
+        "Hey {first_name}! ♡\n\n"
+        "Welcome to my little file-sharing space. Open your collection link to receive your files.\n\n"
+        "Choose an option below to learn more. 🎀"
+    ),
+    "file.help": (
+        "୨୧ ʜᴏᴡ ᴄᴀɴ ɪ ʜᴇʟᴘ? ୨୧\n\n"
+        "Open your collection link to receive its files. If a link does not work or a file is missing, "
+        "contact the configured support account. ♡\n\n"
+        "Use /start to return to the welcome screen."
+    ),
+    "file.about": (
+        "୨୧ ᴀʙᴏᴜᴛ ᴍᴇ ୨୧\n\n"
+        "I am your little file-sharing assistant, designed to make collection access and file delivery "
+        "simple, organized and convenient. Thank you for using me! 🎀"
+    ),
+    "file.link_created": "Your shareable file link is ready:\n{url}",
+    "file.delivery_started": "Your collection is being prepared. Each file will arrive as a separate message. ♡",
+    "file.expired": "This share link is no longer available. Please contact support for assistance.",
+    "file.invalid": "This file link is invalid. Please check the link and try again.",
+    "file.collection_list": "Your File Collections:\n{items}",
+    "file.blocked": "Your account is currently restricted from using this bot. Please contact support if you believe this is an error.",
+    "file.limit_exceeded": "This collection contains {file_count} files, but your current per-request limit is {limit}.",
+    "file.delivery_partial": "Delivery was partially completed: {success}/{total} files. Please contact support if files are missing.",
+}
