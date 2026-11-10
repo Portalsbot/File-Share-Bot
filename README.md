@@ -71,6 +71,7 @@ python -m file_sharing_bot.main
 | /setstoragechannel CHANNEL_ID | Configure central storage channel (Owner only) |
 | /storagehealth | Check central channel reachability and bot membership (admin) |
 | /regenerate SHARE_LINK_ID | Replace an active share token (admin) |
+| /bulkregenerate SHARE_LINK_ID ... | Replace up to 100 active share tokens (admin) |
 | /setmaxfiles LIMIT | Change the default per-request file limit (Owner only) |
 | /setmaxfiles USER_ID LIMIT | Set one user's per-request override (Owner only) |
 | /setmaxfiles reset USER_ID | Remove one user's override (Owner only) |
