@@ -49,7 +49,16 @@ async def upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as exc:
         await _reply(context, update, f"Storage channel is not ready: {type(exc).__name__}. Check bot admin/post permissions.")
         return
-    await context.application.bot_data["db"].require().execute(
+    db = context.application.bot_data["db"]
+    existing = await db.require().fetchrow(
+        """SELECT cardinality(message_ids) AS file_count FROM file_upload_sessions
+           WHERE clone_id=$1 AND user_id=$2 AND active=TRUE""",
+        context.application.bot_data["clone_id"], update.effective_user.id)
+    if existing and int(existing["file_count"] or 0) > 0:
+        await _reply(context, update,
+            f"You already have an active upload session with {existing['file_count']} files. Use /finish to create its link or Cancel to abandon it before starting another.")
+        return
+    await db.require().execute(
         """INSERT INTO file_upload_sessions(clone_id,user_id,source_chat_id,message_ids,active)
            VALUES($1,$2,$3,'{}',TRUE)
            ON CONFLICT(clone_id,user_id) DO UPDATE SET source_chat_id=EXCLUDED.source_chat_id,
