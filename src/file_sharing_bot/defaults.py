@@ -8,10 +8,10 @@ DEFAULT_MESSAGES = {
         "୨୧ ʜᴏᴡ ᴄᴀɴ ɪ ʜᴇʟᴘ? ୨୧\n\n"
         "Open your collection link to receive its files. If a link does not work or a file is missing, "
         "contact the configured support account. ♡\n\n"
-        "Use /start to return to the welcome screen.\\n\\n"
-        "/upload and /finish — upload files and create a permanent share link.\\n"
-        "/collections — list File Collections. /newcollection — create one.\\n"
-        "/addtocollection and /removefromcollection — manage existing share links.\\n"
+        "Use /start to return to the welcome screen.\n\n"
+        "/upload and /finish — upload files and create a permanent share link.\n"
+        "/collections — list File Collections. /newcollection — create one.\n"
+        "/addtocollection and /removefromcollection — manage existing share links.\n"
         "/linkscollection — Owner-only dashboard for permanent collections of existing links."
     ),
     "file.about": (
