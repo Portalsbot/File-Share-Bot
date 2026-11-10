@@ -736,6 +736,31 @@ async def storagehealth(update: Update, context: ContextTypes.DEFAULT_TYPE):
             body = f"Storage channel check failed: {type(exc).__name__}. Verify the bot's membership and channel ID."
     await _reply(context, update, body)
 
+async def bulkregenerate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if not context.args or not all(value.isdigit() for value in context.args):
+        body = "Usage: /bulkregenerate SHARE_LINK_ID SHARE_LINK_ID ..."
+    else:
+        ids = list(dict.fromkeys(int(value) for value in context.args))
+        if len(ids) > 100:
+            body = "A maximum of 100 share links can be regenerated per request."
+        else:
+            db = context.application.bot_data["db"].require()
+            rows = await db.fetch(
+                "SELECT id FROM file_share_links WHERE clone_id=$1 AND id=ANY($2::bigint[]) AND is_active=TRUE ORDER BY id",
+                context.application.bot_data["clone_id"], ids)
+            me = await context.bot.get_me()
+            results = []
+            for row in rows:
+                token = secrets.token_urlsafe(12)
+                await db.execute(
+                    "UPDATE file_share_links SET token=$1 WHERE clone_id=$2 AND id=$3",
+                    token, context.application.bot_data["clone_id"], row["id"])
+                results.append(f"#{row['id']} · https://t.me/{me.username}?start={token}")
+            body = f"Regenerated {len(results)} of {len(ids)} requested links. Old tokens are now invalid.\n\n" + ("\n".join(results) if results else "No active matching links.")
+    await _reply(context, update, body)
+
+
 async def regenerate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _is_admin(update, context):
         return
@@ -965,6 +990,7 @@ def add_file_handlers(app):
     app.add_handler(CommandHandler("setstoragechannel", setstoragechannel))
     app.add_handler(CommandHandler("storagehealth", storagehealth))
     app.add_handler(CommandHandler("regenerate", regenerate))
+    app.add_handler(CommandHandler("bulkregenerate", bulkregenerate))
     app.add_handler(CommandHandler("setmaxfiles", setmaxfiles))
     app.add_handler(CommandHandler("bulkmaxfiles", bulkmaxfiles))
     app.add_handler(CommandHandler("users", users))
