@@ -2,6 +2,7 @@ from __future__ import annotations
 import logging
 import json
 import secrets
+from datetime import datetime, timezone
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import MessageHandler, CallbackQueryHandler, filters
 from telegram.ext import ContextTypes, CommandHandler
@@ -223,6 +224,92 @@ async def batch(update: Update, context: ContextTypes.DEFAULT_TYPE):
             body = "Invalid storage channel or range. Use the configured channel and a range of 1–100 messages."
     await _reply(context, update, body)
 
+async def _collection_policy_for_link(context, link_id: int, user_id: int):
+    rows = await context.application.bot_data["db"].require().fetch(
+        """SELECT collection_key,title,metadata FROM file_collections
+           WHERE clone_id=$1 AND metadata->'link_ids' @> jsonb_build_array($2::bigint)""",
+        context.application.bot_data["clone_id"], link_id)
+    limit = None
+    for row in rows:
+        metadata = row["metadata"] if isinstance(row["metadata"], dict) else json.loads(row["metadata"] or "{}")
+        policy = metadata.get("policy", {})
+        if policy.get("disabled"):
+            return None, f"Collection {row['collection_key']} is currently disabled."
+        allowed = {int(value) for value in policy.get("allowed_users", [])}
+        blocked = {int(value) for value in policy.get("blocked_users", [])}
+        if allowed and user_id not in allowed:
+            return None, f"Your account is not allowed to access collection {row['title']}."
+        if user_id in blocked:
+            return None, f"Your account is blocked from collection {row['title']}."
+        expires_at = policy.get("expires_at")
+        if expires_at:
+            try:
+                expiry = datetime.fromisoformat(expires_at)
+                if expiry.tzinfo is None:
+                    expiry = expiry.replace(tzinfo=timezone.utc)
+                if expiry <= datetime.now(timezone.utc):
+                    return None, f"Collection {row['title']} has expired."
+            except ValueError:
+                return None, f"Collection {row['title']} has an invalid expiry policy. Contact the owner."
+        if policy.get("max_files_per_request") is not None:
+            value = int(policy["max_files_per_request"])
+            limit = value if limit is None else min(limit, value)
+    return limit, None
+
+
+async def collectionpolicy(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update, context): return
+    if not context.args:
+        body = "Usage: /collectionpolicy COLLECTION_ID [maxfiles=N allowed=ID,ID blocked=ID,ID expires=ISO_TIME | clear]"
+    else:
+        key = context.args[0]
+        db = context.application.bot_data["db"].require()
+        row = await db.fetchrow(
+            "SELECT metadata,title FROM file_collections WHERE clone_id=$1 AND collection_key=$2",
+            context.application.bot_data["clone_id"], key)
+        if not row:
+            body = "File Collection not found."
+        else:
+            metadata = row["metadata"] if isinstance(row["metadata"], dict) else json.loads(row["metadata"] or "{}")
+            if len(context.args) == 1:
+                body = f"Policy for {row['title']}: {json.dumps(metadata.get('policy', {}), ensure_ascii=False) or 'none'}"
+            elif context.args[1].lower() == "clear" and len(context.args) == 2:
+                metadata.pop("policy", None)
+                await db.execute("UPDATE file_collections SET metadata=$1::jsonb WHERE clone_id=$2 AND collection_key=$3",
+                                 json.dumps(metadata), context.application.bot_data["clone_id"], key)
+                body = f"Access policy cleared for {key}."
+            else:
+                policy = dict(metadata.get("policy", {}))
+                try:
+                    for item in context.args[1:]:
+                        if "=" not in item: raise ValueError(f"Invalid option: {item}")
+                        name, value = item.split("=", 1)
+                        if name == "maxfiles":
+                            number = int(value)
+                            if number < 1 or number > 10000: raise ValueError("maxfiles must be 1–10000")
+                            policy["max_files_per_request"] = number
+                        elif name in {"allowed", "blocked"}:
+                            ids = [int(x) for x in value.split(",") if x]
+                            if len(ids) > 200 or any(x <= 0 for x in ids): raise ValueError(f"{name} accepts up to 200 positive user IDs")
+                            policy["allowed_users" if name == "allowed" else "blocked_users"] = ids
+                        elif name == "expires":
+                            expiry = datetime.fromisoformat(value)
+                            if expiry.tzinfo is None: raise ValueError("expires must include a timezone offset")
+                            policy["expires_at"] = expiry.isoformat()
+                        elif name == "disabled":
+                            if value.lower() not in {"true", "false"}: raise ValueError("disabled must be true or false")
+                            policy["disabled"] = value.lower() == "true"
+                        else:
+                            raise ValueError(f"Unknown policy option: {name}")
+                    metadata["policy"] = policy
+                    await db.execute("UPDATE file_collections SET metadata=$1::jsonb WHERE clone_id=$2 AND collection_key=$3",
+                                     json.dumps(metadata), context.application.bot_data["clone_id"], key)
+                    body = f"Access policy updated for {key}: {json.dumps(policy, ensure_ascii=False)}"
+                except Exception as exc:
+                    body = f"Policy not changed: {str(exc)[:160]}"
+    await _reply(context, update, body)
+
+
 async def deliver(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args or not update.effective_user:
         return
@@ -260,6 +347,15 @@ async def deliver(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if user_row and user_row["max_files_per_request"]
         else int(context.application.bot_data["max_files_per_user"])
     )
+    collection_limit, policy_error = await _collection_policy_for_link(context, int(row["id"]), user_id)
+    if policy_error:
+        await _reply(context, update, policy_error)
+        await db.require().execute(
+            "INSERT INTO file_delivery_events(clone_id,token,user_id,status,detail) VALUES($1,$2,$3,'failed',$4)",
+            clone_id, token, user_id, "collection_policy_denied")
+        return
+    if collection_limit is not None:
+        per_user_limit = min(per_user_limit, collection_limit)
     if not message_ids:
         await _reply(context, update, context.application.bot_data["defaults"]["file.invalid"])
         return
@@ -828,6 +924,7 @@ def add_file_handlers(app):
     app.add_handler(CommandHandler("batch", batch))
     app.add_handler(CommandHandler("collections", collections))
     app.add_handler(CommandHandler("collection", collection))
+    app.add_handler(CommandHandler("collectionpolicy", collectionpolicy))
     app.add_handler(CommandHandler("newcollection", newcollection))
     app.add_handler(CommandHandler("addtocollection", addtocollection))
     app.add_handler(CommandHandler("removefromcollection", removefromcollection))
