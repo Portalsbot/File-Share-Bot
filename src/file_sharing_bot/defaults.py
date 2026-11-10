@@ -18,7 +18,8 @@ DEFAULT_MESSAGES = {
         "/users, /userinfo, /blockuser, /unblockuser — manage users.\n"
         "/broadcast, /broadcasts, /cancelbroadcast — send and schedule announcements.\n"
         "/backup, /backups, /restore — protect and restore bot data.\n"
-        "/exportdata and /importdata — move a validated JSON backup."
+        "/exportdata and /importdata — move a validated JSON backup.\n"
+        "/bulkregenerate — replace up to 100 existing share-link tokens."
     ),
     "file.about": (
         "୨୧ ᴀʙᴏᴜᴛ ᴍᴇ ୨୧\n\n"
