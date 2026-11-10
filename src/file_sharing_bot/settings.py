@@ -174,6 +174,7 @@ async def configure_command_menu(app):
         BotCommand("exportdata", "Export bot data"),
         BotCommand("importdata", "Import a backup file"),
         BotCommand("texts", "Edit bot messages"),
+        BotCommand("fsubs", "Manage force-subscription channels and message"),
         BotCommand("settings", "Open bot settings")
     ]
     await app.bot.set_my_commands(public_commands)
