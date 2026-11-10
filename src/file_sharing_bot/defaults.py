@@ -7,7 +7,7 @@ DEFAULT_MESSAGES = {
     "file.help": (
         "୨୧ ʜᴏᴡ ᴄᴀɴ ɪ ʜᴇʟᴘ? ୨୧\n\n"
         "Open your collection link to receive its files. If a link does not work or a file is missing, "
-        "contact (LINK url="https://t.me/just_astha")ᴀsᴛʜᴀ(/LINK). ♡\n\n"
+        "contact (LINK url=\"https://t.me/just_astha\")ᴀsᴛʜᴀ(/LINK). ♡\n\n"
         "Use /start to return to the welcome screen.\n\n"
         "/setstoragechannel CHANNEL_ID — configure the central storage channel (Owner only).\n"
         "/upload and /finish — upload files and create a permanent share link.\n"
