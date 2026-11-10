@@ -15,6 +15,7 @@ from .errors import error_handler
 from .branding import close_branded_message
 from .backup import add_backup_handlers
 from .broadcast import add_broadcast_handlers
+from .fsubs import add_fsubs_handlers, message_fsubs_gate, callback_fsubs_gate
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -103,12 +104,15 @@ def main():
         "default_auto_delete": settings.default_auto_delete,
         "max_files_per_user": settings.max_files_per_user, "protect_content": True,
     })
+    app.add_handler(MessageHandler(filters.ALL, message_fsubs_gate), group=-10)
+    app.add_handler(CallbackQueryHandler(callback_fsubs_gate), group=-2)
     app.add_handler(CallbackQueryHandler(close_branded_message, pattern=r"^branding:close$"), group=-1)
     add_common_handlers(app)
     add_editor_handlers(app)
     add_file_handlers(app)
     add_backup_handlers(app)
     add_broadcast_handlers(app)
+    add_fsubs_handlers(app)
     app.add_error_handler(error_handler)
     app.bot_data["health_server"] = _start_health_server()
     app.run_polling(allowed_updates=["message", "callback_query", "chat_member"])
