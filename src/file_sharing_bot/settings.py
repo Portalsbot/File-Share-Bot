@@ -153,6 +153,7 @@ async def configure_command_menu(app):
         BotCommand("setstoragechannel", "Configure the storage channel"),
         BotCommand("storagehealth", "Check storage channel"),
         BotCommand("regenerate", "Regenerate a share link"),
+        BotCommand("bulkregenerate", "Regenerate multiple share links"),
         BotCommand("setmaxfiles", "Set file limits"),
         BotCommand("bulkmaxfiles", "Set limits for multiple users"),
         BotCommand("users", "View registered users"),
