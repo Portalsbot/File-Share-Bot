@@ -44,7 +44,7 @@ async def send_branded(
     if FOOTER_MESSAGE:
         body = f"{body}\n\n{FOOTER_MESSAGE}" if body else FOOTER_MESSAGE
     requested_path = Path(image_path) if image_path else None
-    local_photo = requested_path if requested_path.is_file() else None
+    local_photo = requested_path if requested_path and requested_path.is_file() else None
     if not local_photo and not (image_url or "").startswith(("https://", "http://")):
         raise ValueError("A reachable branding image URL or local image is required.")
     chunks = caption_chunks(body, small_caps=small_caps, limit=700)

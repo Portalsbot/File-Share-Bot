@@ -24,7 +24,6 @@ def test_branded_sender_adds_close_without_dummy_button(monkeypatch, tmp_path):
 def test_every_caption_chunk_has_close(monkeypatch, tmp_path):
     photo = tmp_path / "branding.jpg"
     photo.write_bytes(b"fake-image")
-    monkeypatch.setattr(branding, "IMAGE_PATH", photo)
     bot = SimpleNamespace(send_photo=AsyncMock(side_effect=[
         SimpleNamespace(message_id=1), SimpleNamespace(message_id=2)
     ]))
