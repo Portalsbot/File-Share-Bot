@@ -144,6 +144,7 @@ async def configure_command_menu(app):
         BotCommand("linkscollection", "Manage permanent Link Collections"),
         BotCommand("delivery_stats", "View delivery analytics"),
         BotCommand("dlt_time", "Set file auto-delete time"),
+        BotCommand("setstoragechannel", "Configure the storage channel"),
         BotCommand("storagehealth", "Check storage channel"),
         BotCommand("regenerate", "Regenerate a share link"),
         BotCommand("setmaxfiles", "Set file limits"),
