@@ -265,10 +265,12 @@ async def deliver(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    await _reply(context, update, context.application.bot_data["defaults"]["file.delivery_started"])
     success = 0
-    for message_id in message_ids:
+    for index, message_id in enumerate(message_ids, start=1):
         try:
+            # Telegram cannot attach a separate branding photo to copyMessage.
+            # Send an individually closable branded header immediately before each file.
+            await _reply(context, update, f"ᴅᴇʟɪᴠᴇʀɪɴɢ ғɪʟᴇ {index}/{len(message_ids)}.")
             copied = await context.bot.copy_message(
                 chat_id=update.effective_chat.id, from_chat_id=row["source_chat_id"],
                 message_id=message_id,
