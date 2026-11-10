@@ -176,7 +176,8 @@ async def fsubs_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             from .handlers.files import deliver_token
             await deliver_token(synthetic, context, pending)
         else:
-            await _send(context, query.message.chat_id, "Membership verified. Send /start again to continue.")
+            from .settings import start
+            await start(synthetic, context)
         return
     await query.answer()
     if action in {"fsubs:panel", "fsubs:back"}:
