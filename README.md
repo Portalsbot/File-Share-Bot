@@ -126,3 +126,5 @@ Before upstream code is copied into this private repository, retain source notic
 ## Web-service health check
 
 When deploying as a web service, the platform-provided `PORT` variable starts a lightweight HTTP server. Configure the platform health-check path as `/health`. This endpoint reports process liveness; it does not prove Telegram or PostgreSQL connectivity. Use `/storagehealth` and `/ping` inside Telegram for those checks.
+
+Broadcast text can include one URL button per line using `[button] LABEL | https://URL`. The bot shows a preview before immediate or scheduled delivery.
