@@ -75,6 +75,8 @@ async def collect_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     if not message or not user or not _is_admin(update, context):
         return
+    if context.user_data.pop("suppress_upload_once", False):
+        return
     attachment = (message.document or message.video or message.audio or message.animation
                   or message.voice or message.video_note or message.sticker or message.photo)
     db = context.application.bot_data["db"]
@@ -350,9 +352,16 @@ async def collection(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.application.bot_data["clone_id"], context.args[0],
         )
         if row:
+            metadata = row["metadata"] if isinstance(row["metadata"], dict) else json.loads(row["metadata"] or "{}")
+            ids = [int(value) for value in metadata.get("link_ids", [])]
+            records = await context.application.bot_data["db"].require().fetch(
+                "SELECT id,token FROM file_share_links WHERE clone_id=$1 AND id=ANY($2::bigint[]) AND is_active=TRUE ORDER BY id",
+                context.application.bot_data["clone_id"], ids)
+            me = await context.bot.get_me()
+            links_text = "\n".join(f"#{item['id']} · https://t.me/{me.username}?start={item['token']}" for item in records)
             body = (
                 f"**{row['title']}**\nID: {row['collection_key']}\n"
-                f"Created: {row['created_at']}\nMetadata: {row['metadata']}"
+                f"Created: {row['created_at']}\nActive links: {len(records)}\n\n{links_text or 'No active share links attached.'}"
             )
         else:
             body = "Collection not found."
@@ -470,6 +479,7 @@ async def link_collection_input(update: Update, context: ContextTypes.DEFAULT_TY
     if not _is_owner(update, context) or context.user_data.get("link_collection_action") != "add":
         return
     context.user_data.pop("link_collection_action", None)
+    context.user_data["suppress_upload_once"] = True
     raw = (update.effective_message.text or "").strip()
     if "|" not in raw:
         await _reply(context, update, "Format: COLLECTION NAME | SHARE_LINK_ID SHARE_LINK_ID ...")
