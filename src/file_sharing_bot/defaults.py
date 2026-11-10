@@ -7,7 +7,7 @@ DEFAULT_MESSAGES = {
     "file.help": (
         "୨୧ ʜᴏᴡ ᴄᴀɴ ɪ ʜᴇʟᴘ? ୨୧\n\n"
         "Open your collection link to receive its files. If a link does not work or a file is missing, "
-        "contact the configured support account. ♡\n\n"
+        "contact (LINK url="https://t.me/just_astha")ᴀsᴛʜᴀ(/LINK). ♡\n\n"
         "Use /start to return to the welcome screen.\n\n"
         "/upload and /finish — upload files and create a permanent share link.\n"
         "/collections — list File Collections. /newcollection — create one.\n"
