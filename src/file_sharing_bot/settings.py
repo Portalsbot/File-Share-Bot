@@ -29,6 +29,9 @@ async def _show_screen(update: Update, context: ContextTypes.DEFAULT_TYPE, scree
     body = await context.application.bot_data["db"].get_text(
         context.application.bot_data["clone_id"], key, defaults.get(key, "ᴡᴇʟᴄᴏᴍᴇ!")
     )
+    if screen == "start" and update.effective_user:
+        import html
+        body = body.replace("{first_name}", html.escape(update.effective_user.first_name or "there"))
     saved = await context.application.bot_data["db"].get_buttons(
         context.application.bot_data["clone_id"], key
     )
